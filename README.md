@@ -30,6 +30,13 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 Needs Node (for `npx pagefind`).
 
+## The raw snapshot
+
+`archive/raw/` isn't committed. The October 2026 crawl, including the blog,
+travel and class pages the rebuilt site leaves out, is attached to the
+[raw-snapshot-2026-10 release](https://github.com/thaifoodandtravel/archive/releases/tag/raw-snapshot-2026-10).
+Extract it into `archive/` to re-run `build/extract.py` without crawling again.
+
 ## Re-crawling the archive
 
 Only needed to refresh `archive/raw/`. The Wayback Machine blocks fast crawlers,
