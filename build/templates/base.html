@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% if base_href %}<base href="{{ base_href }}">{% endif %}
+<title>{% if title != site_name %}{{ title }} · {% endif %}{{ site_name }}</title>
+{% if item and item.summary %}<meta name="description" content="{{ item.summary }}">{% else %}<meta name="description" content="{{ tagline }}">{% endif %}
+<meta property="og:title" content="{{ title }}">
+<meta property="og:site_name" content="{{ site_name }}">
+{% if item and item.image %}<meta property="og:image" content="{{ u(item.image) }}">{% endif %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ u('/static/site.css') }}">
+<link rel="icon" href="{{ u('/static/favicon.svg') }}" type="image/svg+xml">
+</head>
+<body class="{% block bodyclass %}{% endblock %}" data-root="{{ u('/') }}">
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="{{ u('/') }}">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3c4 5 9 7 9 14a9 9 0 0 1-18 0c0-7 5-9 9-14z" fill="currentColor"/><path d="M16 9v18" stroke="var(--paper)" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span><strong>{{ site_name }}</strong><small>with Kasma Loha-unchit</small></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="{{ u('/recipes/') }}" {% if page_url.startswith('/recipes') %}aria-current="page"{% endif %}>Recipes</a>
+      <a href="{{ u('/ingredients/') }}" {% if page_url.startswith('/ingredients') or page_url.startswith('/brands') %}aria-current="page"{% endif %}>Ingredients</a>
+      <a href="{{ u('/articles/') }}" {% if page_url.startswith('/articles') or page_url.startswith('/features') %}aria-current="page"{% endif %}>Articles</a>
+      <a href="{{ u('/about/') }}" {% if page_url.startswith('/about') %}aria-current="page"{% endif %}>About</a>
+    </nav>
+    <form class="quicksearch" action="{{ u('/search/') }}" role="search">
+      <label class="sr-only" for="q-top">Search</label>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="q-top" name="q" type="search" placeholder="Search recipes, ingredients…" autocomplete="off">
+      <kbd>/</kbd>
+    </form>
+  </div>
+</header>
+<main id="main">
+{% block main %}{% endblock %}
+</main>
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div>
+      <p class="footer-brand">{{ site_name }}</p>
+      <p>Kasma Loha-unchit retired in 2020 after 35 years of teaching Thai cooking classes and leading trips to
+        Thailand. This archive preserves the recipes, ingredient guides and articles from thaifoodandtravel.com
+        (online since 1998). The blog, trips and classes are in the
+        <a href="https://web.archive.org/web/2020/http://www.thaifoodandtravel.com/">Internet Archive</a>.</p>
+      <p class="muted">Recipes, writing and photographs © Kasma Loha-unchit and Michael Babcock.</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href="{{ u('/recipes/') }}">Recipes</a>
+      <a href="{{ u('/ingredients/') }}">Ingredients</a>
+      <a href="{{ u('/articles/') }}">Articles</a>
+      <a href="{{ u('/about/') }}">About Kasma</a>
+      <a href="https://web.archive.org/web/2020/http://www.thaifoodandtravel.com/blog/">Blog (archived)</a>
+      <a href="https://web.archive.org/web/2020/http://www.thaifoodandtravel.com/trips.html">Trips (archived)</a>
+    </nav>
+  </div>
+</footer>
+<div class="lightbox" hidden>
+  <button class="lightbox-close" aria-label="Close">×</button>
+  <button class="lightbox-prev" aria-label="Previous photo">‹</button>
+  <figure><img alt=""><figcaption></figcaption></figure>
+  <button class="lightbox-next" aria-label="Next photo">›</button>
+</div>
+<script src="{{ u('/static/site.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block main %}
+<section class="wrap page-head">
+  <h1>Page not found</h1>
+  <p class="lede">This page isn't part of the restored site. It may have been a travel or class page, which still live in the
+    <a class="wayback-link" href="https://web.archive.org/web/2016/http://www.thaifoodandtravel.com/">Internet Archive</a>.</p>
+  <form class="bigsearch" action="{{ u('/search/') }}" role="search">
+    <label class="sr-only" for="q-404">Search</label>
+    <input id="q-404" name="q" type="search" placeholder="Search recipes, ingredients…">
+    <button class="btn">Search</button>
+  </form>
+</section>
+<script>
+  // GitHub Pages serves this page at any missing URL (links resolve via <base>).
+  // Point the archive link at the same path on the old site.
+  (function () {
+    var base = {{ base_href | tojson }};
+    var rest = location.pathname.indexOf(base) === 0 ? location.pathname.slice(base.length) : location.pathname.slice(1);
+    document.querySelector(".wayback-link").href = "https://web.archive.org/web/2016/http://www.thaifoodandtravel.com/" + rest;
+  })();
+</script>
+{% endblock %}

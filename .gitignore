@@ -1,0 +1,12 @@
+# raw Wayback mirror (large; regenerate with scraper/crawl.py)
+archive/raw/
+archive/*.log
+*.part
+.venv/
+node_modules/
+_site/
+__pycache__/
+.DS_Store
+
+# capture indexes (regenerate with scraper/crawl.py cdx)
+archive/cdx*.txt

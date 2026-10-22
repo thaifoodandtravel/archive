@@ -1,0 +1,31 @@
+{% macro card(i, u, compact=False) %}
+<a class="card{% if compact or not i.image %} card-text{% endif %}" href="{{ u(i.url) }}">
+  {% if i.image and not compact %}
+  <span class="card-img"><img src="{{ u(i.image) }}" alt="" loading="lazy" decoding="async"></span>
+  {% endif %}
+  <span class="card-body">
+    <span class="card-kicker">{{ i.label }}{% if i.categories and i.type == 'recipe' %} · {{ i.categories[0] }}{% endif %}{% if i.date %} · {{ i.date | date }}{% endif %}</span>
+    <span class="card-title">{{ i.title }}</span>
+    {% if i.thai_name %}<span class="card-thai">{{ i.thai_name }}</span>{% endif %}
+    {% if compact or not i.image %}<span class="card-summary">{{ i.summary }}</span>{% endif %}
+  </span>
+</a>
+{% endmacro %}
+
+{% macro meta_filters(item) %}
+<span hidden data-pagefind-filter="type:{{ item.label }}"></span>
+{% for c in item.categories or [] %}
+<span hidden data-pagefind-filter="{{ 'course' if item.type == 'recipe' else 'category' }}:{{ c }}"></span>
+{% endfor %}
+{% if item.image %}<span hidden data-pagefind-meta="image:{{ item.image.lstrip('/') }}"></span>{% endif %}
+<span hidden data-pagefind-meta="kind:{{ item.label }}"></span>
+{% if item.thai_name %}<span hidden data-pagefind-meta="thai:{{ item.thai_name }}"></span>{% endif %}
+{% endmacro %}
+
+{% macro archive_note(item) %}
+<aside class="archive-note">
+  <p>Originally published on thaifoodandtravel.com{% if item.year %} ({{ item.year }}){% elif item.date %} ({{ item.date[:4] }}){% endif %}.
+  {% if item.wayback %}<a href="{{ item.wayback }}">View the archived original</a>.{% endif %}</p>
+  {% if item.copyright %}<p>{{ item.copyright }}</p>{% endif %}
+</aside>
+{% endmacro %}

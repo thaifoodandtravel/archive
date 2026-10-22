@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "macros.html" import card %}
+{% block bodyclass %}is-home{% endblock %}
+{% block main %}
+<section class="hero{% if hero %} has-photos{% endif %}">
+  <div class="wrap hero-grid">
+  <div class="hero-inner">
+    <p class="eyebrow">Kasma Loha-unchit · Thai cooking 1985–2020</p>
+    <h1>Authentic Thai recipes, ingredients &amp; stories</h1>
+    <p class="lede">For 35 years Kasma taught Bay Area cooks to balance hot, sour, salty and sweet the way it's done in Thailand,
+      and led food lovers on trips across the country. She retired in 2020. Her recipes, ingredient guides and essays
+      are preserved here so they stay easy to find, search and cook from.</p>
+    <form class="bigsearch" action="{{ u('/search/') }}" role="search">
+      <label class="sr-only" for="q-hero">Search the site</label>
+      <input id="q-hero" name="q" type="search" placeholder="Try “green curry”, “galanga” or “sticky rice”" autocomplete="off">
+      <button class="btn">Search</button>
+    </form>
+    <p class="hero-stats">{{ counts.recipe }} recipes · {{ counts.ingredient }} ingredient guides · {{ counts.brand }} favorite brands · {{ counts.article }} articles</p>
+  </div>
+  {% if hero %}
+  <div class="hero-photos n{{ hero | length }}">
+    {% for h in hero %}
+    <a href="{{ u(h.url) }}" class="hero-photo"><img src="{{ u(h.src) }}" alt="{{ h.title }}" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}><span>{{ h.title }}</span></a>
+    {% endfor %}
+  </div>
+  {% endif %}
+  </div>
+</section>
+
+<section class="wrap section">
+  <div class="section-head"><h2>Recipes by course</h2><a href="{{ u('/recipes/') }}">All recipes →</a></div>
+  <ul class="course-tiles">
+    {% for c, lst in courses %}
+    <li><a href="{{ u('/recipes/') }}#{{ c | lower | replace(' & ', '-') | replace(' ', '-') }}"><span>{{ c }}</span><small>{{ lst | length }}</small></a></li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% if featured %}
+<section class="wrap section">
+  <div class="section-head"><h2>Kitchen favorites</h2></div>
+  <div class="grid">{% for r in featured %}{{ card(r, u) }}{% endfor %}</div>
+</section>
+{% endif %}
+
+<section class="band">
+  <div class="wrap section">
+    <div class="section-head"><h2>The essential Thai pantry</h2><a href="{{ u('/ingredients/') }}">All ingredients →</a></div>
+    <ul class="pantry">
+      {% for i in essentials %}
+      <li><a href="{{ u(i.url) }}">
+        {% if i.image %}<img src="{{ u(i.image) }}" alt="" loading="lazy">{% endif %}
+        <span><strong>{{ i.title | replace('(Thai) ', '') }}</strong>{% if i.thai_name %}<em>{{ i.thai_name.split(' (')[0] }}</em>{% endif %}</span>
+      </a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+{% if reading %}
+<section class="wrap section">
+  <div class="section-head"><h2>Learn to cook Thai</h2><a href="{{ u('/articles/') }}">All articles →</a></div>
+  <div class="grid grid-compact">{% for a in reading %}{{ card(a, u, compact=True) }}{% endfor %}</div>
+</section>
+{% endif %}
+
+<section class="wrap section about-strip">
+  <div>
+    <h2>About Kasma</h2>
+    <p>Kasma Loha-unchit grew up in Thailand, outside Bangkok, learning to cook from her mother. She began teaching Thai cooking
+      classes in the San Francisco Bay Area in 1985 and leading trips to Thailand in 1986, and wrote two cookbooks:
+      <em>It Rains Fishes</em>, winner of the Julia Child Cookbook Award, and <em>Dancing Shrimp</em>.
+      She retired from classes and trips in 2020 after 35 years.</p>
+    <a class="btn btn-quiet" href="{{ u('/about/') }}">Her story &amp; cookbooks</a>
+  </div>
+  <div id="archive">
+    <h2>About this archive</h2>
+    <p>Kasma and her husband, Michael Babcock, put thaifoodandtravel.com online in 1998, and it grew into one of the
+      web's deepest resources on Thai cooking. It hasn't seen new content for many years. This site brings the
+      cooking material — recipes, ingredients, brands and articles — into a fast, searchable home, with the
+      original pages' words and photographs.</p>
+    <p>Much more of the original site is still available at the Internet Archive, including the blog, trip
+      journals and class menus. Pages there can load slowly, not every image was captured, and some blog
+      slideshows no longer work — but it's well worth exploring.</p>
+    <ul class="chips">
+      <li><a href="https://web.archive.org/web/2020/http://www.thaifoodandtravel.com/blog/">The blog</a></li>
+      <li><a href="https://web.archive.org/web/2020/http://www.thaifoodandtravel.com/trips.html">Trips to Thailand</a></li>
+      <li><a href="https://web.archive.org/web/2020/http://www.thaifoodandtravel.com/cooking.html">Cooking classes</a></li>
+      <li><a href="https://web.archive.org/web/2020/http://www.thaifoodandtravel.com/">The whole original site</a></li>
+    </ul>
+  </div>
+</section>
+{% endblock %}

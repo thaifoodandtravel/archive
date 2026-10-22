@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "macros.html" import card %}
+{% block main %}
+<section class="wrap page-head">
+  <h1>Thai Recipes</h1>
+  <p class="lede">{{ count }} recipes from Kasma's classes and cookbooks, tested in home kitchens for decades.
+    Thai cooking is about tasting and balancing, so treat the measurements as a starting point and
+    <a href="{{ u('/features/taste.html') }}">cook to taste</a>.</p>
+  <div class="filterbar">
+    <label class="sr-only" for="recipe-filter">Filter recipes</label>
+    <input id="recipe-filter" type="search" placeholder="Filter by name, Thai name or ingredient…" data-filter-target=".course .card">
+  </div>
+  <nav class="jump" aria-label="Courses">
+    {% for c, lst in courses %}<a href="#{{ c | lower | replace(' & ', '-') | replace(' ', '-') }}">{{ c }}</a>{% endfor %}
+  </nav>
+</section>
+{% for c, lst in courses %}
+<section class="wrap course" id="{{ c | lower | replace(' & ', '-') | replace(' ', '-') }}">
+  <h2>{{ c }} <small>{{ lst | length }}</small></h2>
+  <div class="grid">
+    {% for r in lst %}
+    <div class="filter-item" data-text="{{ (r.title ~ ' ' ~ (r.thai_name or '') ~ ' ' ~ ((r.ingredients or []) | join(' '))) | lower }}">{{ card(r, u) }}</div>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+<p class="wrap empty-note" hidden>No recipes match. <a href="{{ u('/search/') }}">Try the full search</a>.</p>
+{% endblock %}

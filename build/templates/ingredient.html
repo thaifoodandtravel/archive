@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "macros.html" import card, meta_filters, archive_note %}
+{% block main %}
+<article class="wrap doc" data-pagefind-body>
+  {{ meta_filters(item) }}
+  <nav class="crumbs" aria-label="Breadcrumb" data-pagefind-ignore><a href="{{ u('/ingredients/') }}">Ingredients</a></nav>
+  <header class="doc-head">
+    <h1 data-pagefind-meta="title" data-pagefind-weight="10">{{ item.title | replace('(Thai) ', '') }}</h1>
+    {% if item.thai_name %}<p class="thai-name" data-pagefind-weight="8">{{ item.thai_name }}</p>{% endif %}
+    <p class="byline">By {{ item.author }}</p>
+  </header>
+  <div class="prose">
+    {{ item.html | safe }}
+  </div>
+  {{ archive_note(item) }}
+  <span hidden>{{ search_extra }}</span>
+</article>
+{% if item.recipes %}
+<section class="wrap more" data-pagefind-ignore>
+  <h2>Recipes using {{ item.title | replace('(Thai) ', '') | lower }}</h2>
+  <div class="grid">{% for r in item.recipes %}{{ card(r, u) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% if item.articles %}
+<section class="wrap more" data-pagefind-ignore>
+  <h2>Further reading</h2>
+  <div class="grid grid-compact">{% for a in item.articles %}{{ card(a, u, compact=True) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

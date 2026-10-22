@@ -1,0 +1,18 @@
+{
+ "/features/kaflime09.html": "/features/kaflime05.html",
+ "/features/kaflime1.html": "/features/kaflime01.html",
+ "/features/kaflime2.html": "/features/kaflime02.html",
+ "/features/kaflime3.html": "/features/kaflime03.html",
+ "/features/kaflime4.html": "/features/kaflime04.html",
+ "/features/kaflime5.html": "/features/kaflime05.html",
+ "/features/kaflime_1page.html": "/features/kaflime.html",
+ "/features/roti.html": "/features/sothai.html",
+ "/recipes/baschi.html": "/recipes/basil-chicken-recipe.html",
+ "/recipes/broccoli.html": "/recipes/brocolli.html",
+ "/recipes/greenp.html": "/recipes/green-papaya-salad.html",
+ "/recipes/padthai.html": "/recipes/pad-thai-recipe.html",
+ "/recipes/printable/sautesquidp.html": "/recipes/sautesquid.html",
+ "/recipes/printable/tilapiap.html": "/recipes/tilapia.html",
+ "/recipes/printable/turmcatcocp.html": "/recipes/turmcatcoc.html",
+ "/recipes/psoup.html": "/recipes/pumpsoup.html"
+}

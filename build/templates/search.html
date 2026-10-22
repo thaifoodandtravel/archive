@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block bodyclass %}is-search{% endblock %}
+{% block main %}
+<section class="wrap page-head">
+  <h1>Search</h1>
+  <form class="bigsearch" role="search" onsubmit="return false">
+    <label class="sr-only" for="q">Search the site</label>
+    <input id="q" name="q" type="search" placeholder="Search recipes, ingredients and articles" autocomplete="off" autofocus>
+  </form>
+  <div class="chips chips-filter search-filters" role="group" aria-label="Filter by type" hidden></div>
+  <p class="search-status muted" aria-live="polite"></p>
+</section>
+<section class="wrap">
+  <ol class="results"></ol>
+  <button class="btn btn-quiet more-results" hidden>Show more results</button>
+  <noscript><p>Search needs JavaScript. Browse <a href="{{ u('/recipes/') }}">recipes</a> or <a href="{{ u('/ingredients/') }}">ingredients</a> instead.</p></noscript>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ u('/static/search.js') }}" defer></script>{% endblock %}

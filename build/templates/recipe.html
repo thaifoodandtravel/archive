@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "macros.html" import card, meta_filters, archive_note %}
+{% block bodyclass %}is-recipe{% endblock %}
+{% block main %}
+<article class="wrap doc" data-pagefind-body>
+  {{ meta_filters(item) }}
+  <nav class="crumbs" aria-label="Breadcrumb" data-pagefind-ignore>
+    <a href="{{ u('/recipes/') }}">Recipes</a>
+    {% for c in item.categories %}<span>›</span><a href="{{ u('/recipes/') }}#{{ c | lower | replace(' & ', '-') | replace(' ', '-') }}">{{ c }}</a>{% endfor %}
+  </nav>
+  <header class="doc-head">
+    <h1 data-pagefind-meta="title" data-pagefind-weight="10">{{ item.title }}</h1>
+    {% if item.thai_name %}<p class="thai-name" data-pagefind-weight="8">{{ item.thai_name }}</p>{% endif %}
+    <p class="byline">A recipe by {{ item.author }}{% if item.year %} · {{ item.year }}{% endif %}{% if item.serves %} · {{ item.serves | replace('.', '') }}{% endif %}</p>
+    <div class="doc-actions" data-pagefind-ignore>
+      {% if item.ingredients %}<a class="btn" href="#ingredients">Jump to ingredients</a>{% endif %}
+      <button class="btn btn-quiet" onclick="window.print()">Print</button>
+    </div>
+  </header>
+  <div class="prose recipe-body">
+    {{ item.html | safe }}
+  </div>
+  {% if item.uses %}
+  <section class="aside-block" data-pagefind-ignore>
+    <h2>Ingredients in this recipe</h2>
+    <ul class="chips">
+      {% for ing in item.uses %}<li><a href="{{ u(ing.url) }}">{{ ing.title | replace('(Thai) ', '') }}{% if ing.thai_name %} <em>{{ ing.thai_name.split(' (')[0] }}</em>{% endif %}</a></li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+  {{ archive_note(item) }}
+  <span hidden>{{ search_extra }}</span>
+</article>
+{% if siblings %}
+<section class="wrap more" data-pagefind-ignore>
+  <h2>More {{ item.categories[0] | lower }}</h2>
+  <div class="grid">{% for r in siblings %}{{ card(r, u) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

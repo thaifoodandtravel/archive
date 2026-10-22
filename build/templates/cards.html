@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "macros.html" import card %}
+{% block main %}
+<section class="wrap page-head">
+  <h1>{{ title }}</h1>
+  {% if intro %}<p class="lede">{{ intro }}</p>{% endif %}
+  {% if items | length > 12 %}
+  <div class="filterbar">
+    <label class="sr-only" for="list-filter">Filter</label>
+    <input id="list-filter" type="search" placeholder="Filter {{ title | lower }}…">
+  </div>
+  {% endif %}
+</section>
+<section class="wrap">
+  <div class="grid{% if compact %} grid-compact{% endif %}">
+    {% for i in items %}
+    <div class="filter-item" data-text="{{ (i.title ~ ' ' ~ (i.thai_name or '') ~ ' ' ~ i.summary) | lower }}">{{ card(i, u, compact=compact) }}</div>
+    {% endfor %}
+  </div>
+  <p class="empty-note" hidden>Nothing matches. <a href="{{ u('/search/') }}">Try the full search</a>.</p>
+</section>
+{% if extra %}
+<section class="wrap section" id="brands">
+  <div class="section-head"><h2>{{ extra_title }}</h2></div>
+  <div class="grid grid-compact">{% for i in extra %}{{ card(i, u, compact=True) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}
