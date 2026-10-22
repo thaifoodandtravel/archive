@@ -9,6 +9,7 @@
   var filterBar = document.querySelector(".search-filters");
   var moreBtn = document.querySelector(".more-results");
   var PAGE = 12;
+  var RERANK = 40; // top results re-sorted so title matches come first
   var pagefind, results = [], shown = 0, kind = "", seq = 0;
 
   function esc(s) {
@@ -18,7 +19,8 @@
   async function load() {
     try {
       pagefind = await import(new URL("pagefind/pagefind.js", root).href);
-      await pagefind.options({ baseUrl: root.pathname, excerptLength: 26 });
+      // a milder length penalty: long recipes (Pad Thai) shouldn't lose to short mentions
+      await pagefind.options({ baseUrl: root.pathname, excerptLength: 26, ranking: { pageLength: 0.2 } });
       await pagefind.filters(); // per-query filter counts need the filter index loaded
     } catch (e) {
       status.textContent = "Search index not found. (It's generated when the site is built — run pagefind.)";
@@ -62,7 +64,8 @@
     var counts = kind ? (await pagefind.search(q)).filters.type : search.filters.type;
     if (my !== seq) return;
     renderFilters(counts);
-    results = search.results;
+    results = await rerank(q, search.results);
+    if (my !== seq) return;
     shown = 0;
     list.innerHTML = "";
     status.textContent = results.length ? results.length + " result" + (results.length === 1 ? "" : "s") + " for “" + q + "”"
@@ -70,11 +73,34 @@
     more();
   }
 
+  function norm(s) {
+    return " " + String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() + " ";
+  }
+
+  // Pagefind ranks by word frequency, so a dish name like "pad thai" loses to pages
+  // that say "pad" a lot. Promote pages whose title (or Thai name) matches the query:
+  // whole phrase first, then all words; otherwise keep Pagefind's order.
+  async function rerank(q, raw) {
+    var head = raw.slice(0, RERANK);
+    var data = await Promise.all(head.map(function (r) { return r.data(); }));
+    var words = norm(q).trim().split(" ");
+    var phrase = norm(q);
+    var scored = head.map(function (r, i) {
+      var d = data[i], m = d.meta || {};
+      var t = norm(m.title) + norm(m.thai);
+      var score = t.indexOf(phrase) !== -1 ? 2
+        : words.every(function (w) { return t.indexOf(" " + w + " ") !== -1; }) ? 1 : 0;
+      return { result: r, data: d, score: score, i: i };
+    });
+    scored.sort(function (a, b) { return b.score - a.score || a.i - b.i; });
+    return scored.concat(raw.slice(RERANK).map(function (r) { return { result: r }; }));
+  }
+
   async function more() {
     var batch = results.slice(shown, shown + PAGE);
     shown += batch.length;
     var my = seq;
-    var data = await Promise.all(batch.map(function (r) { return r.data(); }));
+    var data = await Promise.all(batch.map(function (x) { return x.data || x.result.data(); }));
     if (my !== seq) return;
     list.insertAdjacentHTML("beforeend", data.map(function (d) {
       var m = d.meta || {};
