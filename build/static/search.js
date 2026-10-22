@@ -9,7 +9,7 @@
   var filterBar = document.querySelector(".search-filters");
   var moreBtn = document.querySelector(".more-results");
   var PAGE = 12;
-  var RERANK = 40; // top results re-sorted so title matches come first
+  var RERANK = 100; // top results re-sorted so title matches come first
   var pagefind, results = [], shown = 0, kind = "", seq = 0;
 
   function esc(s) {
@@ -73,24 +73,41 @@
     more();
   }
 
-  function norm(s) {
-    return " " + String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() + " ";
+  function words(s) {
+    return String(s || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  }
+  // crude English stem so "noodles" matches "Noodle" and "curry" matches "Curries"
+  function stem(w) {
+    return w.replace(/ie[sd]$/, "y").replace(/(s|x|z|ch|sh)es$/, "$1").replace(/([^s])s$/, "$1").replace(/ed$/, "");
   }
 
   // Pagefind ranks by word frequency, so a dish name like "pad thai" loses to pages
   // that say "pad" a lot. Promote pages whose title (or Thai name) matches the query:
-  // whole phrase first, then all words; otherwise keep Pagefind's order.
+  // exact title, then the whole phrase, then all words; otherwise keep Pagefind's order.
+  // The last query word is treated as a prefix, since people search as they type.
+  function titleScore(qw, title) {
+    var tw = words(title), ts = tw.map(stem);
+    if (!tw.length) return 0;
+    function hit(j, k) {
+      return k === qw.length - 1 ? tw[j].indexOf(qw[k]) === 0 || ts[j] === stem(qw[k]) : ts[j] === stem(qw[k]);
+    }
+    if (tw.length === qw.length && qw.every(function (_, k) { return hit(k, k); })) return 4;
+    for (var j = 0; j + qw.length <= tw.length; j++) {
+      if (qw.every(function (_, k) { return hit(j + k, k); })) return 3;
+    }
+    return qw.every(function (_, k) {
+      return tw.some(function (_, j) { return hit(j, k); });
+    }) ? 2 : 0;
+  }
+
   async function rerank(q, raw) {
     var head = raw.slice(0, RERANK);
     var data = await Promise.all(head.map(function (r) { return r.data(); }));
-    var words = norm(q).trim().split(" ");
-    var phrase = norm(q);
+    var qw = words(q);
     var scored = head.map(function (r, i) {
-      var d = data[i], m = d.meta || {};
-      var t = norm(m.title) + norm(m.thai);
-      var score = t.indexOf(phrase) !== -1 ? 2
-        : words.every(function (w) { return t.indexOf(" " + w + " ") !== -1; }) ? 1 : 0;
-      return { result: r, data: d, score: score, i: i };
+      var m = data[i].meta || {};
+      var score = Math.max(titleScore(qw, m.title), titleScore(qw, m.thai) - 1);
+      return { result: r, data: data[i], score: score, i: i };
     });
     scored.sort(function (a, b) { return b.score - a.score || a.i - b.i; });
     return scored.concat(raw.slice(RERANK).map(function (r) { return { result: r }; }));
