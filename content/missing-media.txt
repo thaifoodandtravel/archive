@@ -12,4 +12,3 @@
 /features/hortusb/thumbnails/hortusb07.jpg
 /features/hortusb/thumbnails/hortusb09.jpg
 /images/kasmaabl.jpg
-/images/roaschil.jpg

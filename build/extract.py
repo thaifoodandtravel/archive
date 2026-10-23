@@ -73,6 +73,10 @@ TYPE_DIRS = {"recipe": "recipes", "ingredient": "ingredients", "brand": "brands"
 
 BOILERPLATE_RE = re.compile(
     r"^\(?\s*click (on )?(an |the )?(image|picture|photo)s?\b.*(larger|enlarge|bigger)", re.I)
+# Old page footers ("Direct comments ... to: webmaster@...  Last Updated ...")
+FOOTER_RE = re.compile(r"Direct comments, feedback or questions to|All material on this website is Copyright", re.I)
+# Email addresses are never republished; "(name@host)" loses its brackets too.
+EMAIL_RE = re.compile(r"\s*\(?\b[\w.%+-]+@[\w-]+(\.[\w-]+)+\b\)?")
 
 
 # ------------------------------------------------------------------ helpers
@@ -374,10 +378,15 @@ class Extractor:
             if a.get("class") == ["zoom"] or "zoom" in (a.get("class") or []):
                 continue
             self.mark_link(a, page_path)
+        for s in root.find_all(string=EMAIL_RE):
+            s.replace_with(EMAIL_RE.sub("", s))
         # strip boilerplate paragraphs and empties
-        for p in root.find_all(["p", "li", "h2", "h3", "h4", "strong", "em"]):
+        for p in root.find_all(["p", "li", "h2", "h3", "h4", "strong", "em", "small"]):
+            if p.decomposed:
+                continue
             t = text(p)
-            if BOILERPLATE_RE.search(t) or t in ("Return to top", "back to top"):
+            # (old pages can wrap the whole body in one element, so footers only go when short)
+            if BOILERPLATE_RE.search(t) or (FOOTER_RE.search(t) and len(t) < 600) or t in ("Return to top", "back to top"):
                 p.decompose()
             elif not t and not p.find(["img", "figure", "iframe", "br"]):
                 p.decompose()
@@ -427,6 +436,12 @@ class Extractor:
         content = soup.select_one("#content")
         if content is None:
             content = self.largest_block(soup)
+            # old layouts start the content cell with a sidebar of section links
+            for el in content.find_all(["blockquote", "table", "div", "p", "ul", "td", "strong"]) if content else []:
+                t = text(el)
+                if re.match(r"More (Recipes|Articles)\b", t) and len(t) < 120:
+                    el.decompose()
+                    break
         if content is None:
             return None
         h1 = content.find("h1") or soup.find("h1")
@@ -483,10 +498,14 @@ class Extractor:
         return item
 
     def largest_block(self, soup):
-        """For pre-2005 table layouts: the cell with the most paragraph text."""
+        """For pre-2005 table layouts: the cell with the most paragraph text,
+        skipping the footer ("About this site") and navigation cells."""
         best, best_len = None, 0
         for cell in soup.find_all(["td", "div"]):
-            n = sum(len(text(p)) for p in cell.find_all("p", recursive=False)) or len(text(cell)) * 0.3
+            t = text(cell)
+            if re.match(r"(About this site|On This Site)", t, re.I) or (FOOTER_RE.search(t) and len(t) < 600):
+                continue
+            n = sum(len(text(p)) for p in cell.find_all("p", recursive=False)) or len(t) * 0.3
             if n > best_len:
                 best, best_len = cell, n
         return best
@@ -616,6 +635,11 @@ class Extractor:
                 continue
             # brand pages are short by nature (a bottle photo and a note)
             if typ != "brand" and is_photo_page(soup):
+                continue
+            body_text = text(soup.body).lower()
+            # pages Kasma emptied ("This recipe is no longer on our website") and
+            # old photo-only pages ("click picture to return")
+            if re.search(r"no longer on our website|(page|recipe|article) has been removed|click picture to return", body_text):
                 continue
             item = self.extract_static(typ, path, fp, soup)
             if item and item["body"]:
