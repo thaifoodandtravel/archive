@@ -61,10 +61,14 @@ paths (`/recipes/beefno.html`), and duplicate/legacy pages redirect.
 
 ### Custom domain
 
-To serve the site at thaifoodandtravel.com: add the domain under Settings →
-Pages → Custom domain, add a `CNAME` file containing `thaifoodandtravel.com` to
-the repo root, and point the domain's DNS at GitHub Pages (four `A` records for
-the apex and a `CNAME` for `www`).
+The site is served at **www.thaifoodandtravel.com** (the `CNAME` file; GitHub
+redirects the bare domain to `www`). DNS is hosted on Cloudflare (free plan):
+four `A` records on the apex for GitHub Pages and `www` as a CNAME to
+`thaifoodandtravel.github.io`, all **DNS only** (grey cloud) so GitHub can
+issue the HTTPS certificate. The domain doesn't receive email; null MX, SPF
+`-all` and DMARC `p=reject` records stop it being spoofed.
+
+The registration is with eNom through Westhost (reseller), paid through 2031.
 
 ## Credits
 
