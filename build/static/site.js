@@ -34,6 +34,15 @@
         show(i);
       });
     });
+    // text links that start the slideshow at the first photo of a gallery
+    document.querySelectorAll("[data-lightbox-start]").forEach(function (link) {
+      link.addEventListener("click", function (e) {
+        var first = document.querySelector(link.dataset.lightboxStart + " a.zoom");
+        if (!first) return;
+        e.preventDefault();
+        show(zooms.indexOf(first));
+      });
+    });
     box.addEventListener("click", function (e) {
       if (e.target.closest(".lightbox-prev")) show(current - 1);
       else if (e.target.closest(".lightbox-next")) show(current + 1);

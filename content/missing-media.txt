@@ -1,8 +1,0 @@
-/features/hortusb/thumbnails/hortusb01.jpg
-/features/hortusb/thumbnails/hortusb02.jpg
-/features/hortusb/thumbnails/hortusb03.jpg
-/features/hortusb/thumbnails/hortusb04.jpg
-/features/hortusb/thumbnails/hortusb05.jpg
-/features/hortusb/thumbnails/hortusb06.jpg
-/features/hortusb/thumbnails/hortusb07.jpg
-/features/hortusb/thumbnails/hortusb09.jpg

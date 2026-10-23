@@ -246,6 +246,10 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 650; line-height: 1.15;
 .photo { margin: .4rem 0 1.25rem; max-width: 100%; }
 .photo img { border-radius: 10px; display: block; }
 .photo a.zoom { display: block; width: fit-content; max-width: 100%; cursor: zoom-in; }
+.gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 120px)); justify-content: start; gap: .5rem; margin: 1.25rem 0; clear: both; }
+.gallery .photo { margin: 0; }
+.gallery .photo a.zoom { width: 100%; }
+.gallery .photo img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
 .photo figcaption { font-size: .88rem; color: var(--muted); margin-top: .35rem; line-height: 1.35; }
 @media (min-width: 720px) {
   .photo.left { float: left; margin: .35rem 1.5rem 1rem 0; max-width: 46%; }
