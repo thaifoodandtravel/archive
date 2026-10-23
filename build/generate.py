@@ -82,6 +82,7 @@ INGREDIENT_TERMS = {
 # Kasma romanizes Thai with gk/dt/bp ("Gkaprow", "Dtom Yum"); readers usually
 # search for the common spellings. Only words with those digraphs are Thai, so
 # only those get variants (indexed as hidden text on each page).
+IMAGE_EXT_RE = re.compile(r"\.(?:jpe?g|png|gif|webp)$", re.I)
 THAI_WORD_RE = re.compile(r"\b[a-z]*(?:gk|dt|bp)[a-z]*\b", re.I)
 ROMANIZATION = [("gk", "k"), ("dt", "t"), ("bp", "p"), ("ow", "ao"), ("ahm", "am"), ("ahn", "an")]
 
@@ -188,6 +189,8 @@ def rewrite_body(body, page_url, missing):
     for a in soup.find_all("a", href=True):
         href = a["href"]
         if href.startswith("/"):
+            if IMAGE_EXT_RE.search(href) and a.find("img"):
+                a["class"] = (a.get("class") or []) + ["zoom"]
             if "zoom" in (a.get("class") or []):
                 if not os.path.exists(os.path.join(MEDIA, href.lstrip("/"))):
                     a.unwrap()
@@ -198,6 +201,10 @@ def rewrite_body(body, page_url, missing):
     for fig in soup.find_all("figure"):
         if not fig.find("img"):
             fig.decompose()
+    for img in soup.select("figure.photo img"):
+        if not img.find_parent("a"):
+            link = soup.new_tag("a", href=img["src"], attrs={"class": "zoom"})
+            img.wrap(link)
     for h in soup.find_all(["h2", "h3"]):
         if h.get_text(strip=True).lower() == "ingredients" and not soup.find(id="ingredients"):
             h["id"] = "ingredients"
@@ -354,11 +361,11 @@ class Site:
             os.makedirs(os.path.dirname(f), exist_ok=True)
             target = relurl(new, old)
             with open(f, "w") as fh:
-                fh.write(f'<!doctype html><meta charset="utf-8"><title>Moved</title>'
+                fh.write(f'<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved</title>'
                          f'<meta name="robots" content="noindex">'
                          f'<link rel="canonical" href="{html.escape(target)}">'
-                         f'<meta http-equiv="refresh" content="0; url={html.escape(target)}">'
-                         f'<p>This page has moved to <a href="{html.escape(target)}">{html.escape(target)}</a>.</p>')
+                         f'<meta http-equiv="refresh" content="0; url={html.escape(target)}"></head>'
+                         f'<body><p>This page has moved to <a href="{html.escape(target)}">{html.escape(target)}</a>.</p></body></html>')
             n += 1
         print(f"{n} redirect pages", file=sys.stderr)
 
